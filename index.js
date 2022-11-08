@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 
@@ -35,7 +35,7 @@ const serviceCollenction = database.collection("services");
 
 // endpoints
 try {
-  // get only 3 data from serviceCollection
+  // get only 3 services from serviceCollection
   app.get("/limitServices", async (req, res) => {
     const query = {};
     const cursor = serviceCollenction.find(query);
@@ -56,7 +56,7 @@ try {
 }
 
 try {
-  // get all from serviceCollection
+  // get all services from serviceCollection
   app.get("/services", async (req, res) => {
     const query = {};
     const cursor = serviceCollenction.find(query);
@@ -68,6 +68,28 @@ try {
       data: allServices,
     });
   });
+} catch (error) {
+  res.json({
+    status: false,
+    message: error.message,
+    data: null,
+  });
+}
+
+try {
+  // get single service
+  app.get("/service/:id", async(req, res) => {
+    const id = req.params.id;
+    const query = {_id: ObjectId(id)};
+    
+    const service = await serviceCollenction.findOne(query);
+    res.json({
+      status: true,
+      message: 'data got successfully',
+      data: service
+    })
+  })
+  
 } catch (error) {
   res.json({
     status: false,
