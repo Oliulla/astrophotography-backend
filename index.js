@@ -35,6 +35,7 @@ const serviceCollenction = database.collection("services");
 
 // endpoints
 try {
+  // get only 3 data from serviceCollection
   app.get("/limitServices", async (req, res) => {
     const query = {};
     const cursor = serviceCollenction.find(query);
@@ -44,6 +45,27 @@ try {
       status: true,
       message: "data got successfully",
       data: services,
+    });
+  });
+} catch (error) {
+  res.json({
+    status: false,
+    message: error.message,
+    data: null,
+  });
+}
+
+try {
+  // get all from serviceCollection
+  app.get("/services", async (req, res) => {
+    const query = {};
+    const cursor = serviceCollenction.find(query);
+
+    const allServices = await cursor.toArray();
+    res.json({
+      status: true,
+      message: "data got successfully",
+      data: allServices,
     });
   });
 } catch (error) {
