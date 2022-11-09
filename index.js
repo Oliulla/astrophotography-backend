@@ -32,6 +32,7 @@ dbConnect();
 // database and collections
 const database = client.db("astroAdmin");
 const serviceCollenction = database.collection("services");
+const usersReviewCollection = database.collection("usersReview");
 
 // endpoints
 try {
@@ -78,18 +79,35 @@ try {
 
 try {
   // get single service
-  app.get("/service/:id", async(req, res) => {
+  app.get("/service/:id", async (req, res) => {
     const id = req.params.id;
-    const query = {_id: ObjectId(id)};
-    
+    const query = { _id: ObjectId(id) };
+
     const service = await serviceCollenction.findOne(query);
     res.json({
       status: true,
-      message: 'data got successfully',
-      data: service
-    })
-  })
-  
+      message: "data got successfully",
+      data: service,
+    });
+  });
+} catch (error) {
+  res.json({
+    status: false,
+    message: error.message,
+    data: null,
+  });
+}
+
+// post users reviews
+try {
+  app.post("/reviews", async (req, res) => {
+    const result = await usersReviewCollection.insertOne(req.body);
+    res.json({
+      status: true,
+      message: "data inserted successfully",
+    });
+    console.log(result)
+  });
 } catch (error) {
   res.json({
     status: false,
