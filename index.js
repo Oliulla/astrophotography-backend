@@ -34,7 +34,27 @@ const database = client.db("astroAdmin");
 const serviceCollenction = database.collection("services");
 const usersReviewCollection = database.collection("usersReview");
 
+
 // endpoints
+// add services in db
+try {
+  app.post('/services', async(req, res) => {
+    const result = await serviceCollenction.insertOne(req.body);
+    res.json({
+      status: true,
+      message: "service inserted successfully",
+    });
+    console.log(result)
+  });
+} catch (error) {
+  res.json({
+    status: false,
+    message: error.message,
+    data: null,
+  });
+}
+
+
 try {
   // get only 3 services from serviceCollection
   app.get("/limitServices", async (req, res) => {
@@ -106,7 +126,6 @@ try {
       status: true,
       message: "data inserted successfully",
     });
-    console.log(result)
   });
 } catch (error) {
   res.json({
