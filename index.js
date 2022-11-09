@@ -116,6 +116,28 @@ try {
   });
 }
 
+// get users reviews
+try {
+  app.get('/reviews', async(req, res) => {
+    // const { id } = req.params;
+    // console.log(id)
+    const cursor = usersReviewCollection.find({});
+    const reviews = await cursor.toArray();
+
+    res.json({
+      status: true,
+      message: "data got successfully",
+      data: reviews,
+    });
+  })
+} catch (error) {
+  res.json({
+    status: false,
+    message: error.message,
+    data: null,
+  });
+}
+
 // check starting server
 app.get("/", (req, res) => {
   try {
