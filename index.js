@@ -176,6 +176,50 @@ try {
   });
 }
 
+// send single review response
+try {
+  app.get('/reviews/:id', async(req, res) => {
+    const id = req.params.id;
+    const query = { _id: ObjectId(id)}
+
+    const review = await usersReviewCollection.findOne(query);
+
+    res.json({
+      status: true,
+      message: "data got successfully",
+      data: review,
+    });
+  })
+} catch (error) {
+  res.send({
+    status: false,
+    message: "data got failed",
+  });
+}
+
+// update user review text
+app.put("/reviews/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const updatedReview = req.body;
+    console.log(updatedReview);
+    const result = await usersReviewCollection.updateOne({ _id: ObjectId(id) }, { $set: updatedReview });
+
+    res.json({
+      status: true,
+      message: 'updated successfully',
+      data: result
+    })
+    
+  } catch (error) {
+    res.send({
+      success: false,
+      error: "Update failed"
+    });
+  }
+});
+
 
 // delete specific review
 try {
