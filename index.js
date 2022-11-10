@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { query } = require("express");
 require("dotenv").config();
 const app = express();
 
@@ -40,11 +41,17 @@ const usersReviewCollection = database.collection("usersReview");
 try {
   app.post('/services', async(req, res) => {
     const result = await serviceCollenction.insertOne(req.body);
-    res.json({
-      status: true,
-      message: "service inserted successfully",
-    });
-    console.log(result)
+    if(result.acknowledged) {
+      res.json({
+        status: true,
+        message: "service inserted successfully",
+      });
+    } else {
+      res.json({
+        status: false,
+        message: "service inserted failed",
+      });
+    }
   });
 } catch (error) {
   res.json({
@@ -56,7 +63,7 @@ try {
 
 
 try {
-  // get only 3 services from serviceCollection
+  // send only 3 services from serviceCollection
   app.get("/limitServices", async (req, res) => {
     const query = {};
     const cursor = serviceCollenction.find(query);
@@ -77,7 +84,7 @@ try {
 }
 
 try {
-  // get all services from serviceCollection
+  // send all services from serviceCollection
   app.get("/services", async (req, res) => {
     const query = {};
     const cursor = serviceCollenction.find(query);
@@ -98,7 +105,7 @@ try {
 }
 
 try {
-  // get single service
+  // send single service
   app.get("/service/:id", async (req, res) => {
     const id = req.params.id;
     const query = { _id: ObjectId(id) };
@@ -122,10 +129,17 @@ try {
 try {
   app.post("/reviews", async (req, res) => {
     const result = await usersReviewCollection.insertOne(req.body);
-    res.json({
-      status: true,
-      message: "data inserted successfully",
-    });
+    if(result.acknowledged) {
+      res.json({
+        status: true,
+        message: "data inserted successfully",
+      });
+    } else {
+      res.json({
+        status: false,
+        message: "data inserted failed",
+      });
+    }
   });
 } catch (error) {
   res.json({
@@ -135,12 +149,17 @@ try {
   });
 }
 
-// get users reviews
+// send all users review
 try {
   app.get('/reviews', async(req, res) => {
-    // const { id } = req.params;
-    // console.log(id)
-    const cursor = usersReviewCollection.find({});
+    let query = {};
+    const userEmail = req?.query?.email;
+    if(userEmail) {
+      query = {
+        userEmail
+      }
+    }
+    const cursor = usersReviewCollection.find(query);
     const reviews = await cursor.toArray();
 
     res.json({
@@ -154,6 +173,34 @@ try {
     status: false,
     message: error.message,
     data: null,
+  });
+}
+
+
+// delete specific review
+try {
+  app.delete('/reviews/:id', async(req, res) => {
+    const id = req.params.id;
+    const query = {_id: ObjectId(id)};
+    const result = await usersReviewCollection.deleteOne(query);
+    console.log(result);
+    if (result.deletedCount) {
+      res.json({
+        status: true,
+        message: 'Successfully deleted one document',
+        data: result
+      })
+    } else {
+      res.json({
+        status: false,
+        message: 'No documents matched the query. Deleted 0 documents'
+      })
+    }
+  })
+} catch (error) {
+  res.send({
+    status: false,
+    message: "delete review failed",
   });
 }
 
