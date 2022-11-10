@@ -191,13 +191,16 @@ try {
     }
 
     let query = {};
+    const options = {
+      sort: {"submitTime": -1}
+    }
     const userEmail = req?.query?.email;
     if (userEmail) {
       query = {
         userEmail
       };
     }
-    const cursor = usersReviewCollection.find(query);
+    const cursor = usersReviewCollection.find(query, options);
     const reviews = await cursor.toArray();
 
     res.json({
