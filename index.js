@@ -24,6 +24,7 @@ const client = new MongoClient(uri, {
 function verifyJWT(req, res, next) {
   // console.log(req.headers.authorization);
   const authHeader = req.headers.authorization;
+  // console.log(authHeader);
   if(!authHeader) {
     return res.status(401).send({message: 'unauthorized access'});
   }
@@ -179,15 +180,37 @@ try {
   });
 }
 
+// send all reviews
+try {
+  app.get('/allreviews', async(req, res) => {
+
+    const options = {
+      sort: {"submitTime": -1}
+    }
+    const reviews = await usersReviewCollection.find({}, options).toArray();
+    res.json({
+      status: true,
+      message: "data got successfully",
+      data: reviews,
+    });
+  })
+} catch (error) {
+  res.json({
+    status: false,
+    message: error.message,
+    data: null,
+  });
+}
+
 // send all users review
 try {
   app.get("/reviews", verifyJWT, async (req, res) => {
     
     const decoded = req.decoded;
-    console.log("inside", decoded)
+    // console.log("inside", decoded)
 
     if(decoded.email !== req?.query?.email) {
-      res.status(403).send({message: "unauthorizad forbidden"})
+      res.status(403).send({message: "unauthorizad access"})
     }
 
     let query = {};
@@ -200,6 +223,7 @@ try {
         userEmail
       };
     }
+
     const cursor = usersReviewCollection.find(query, options);
     const reviews = await cursor.toArray();
 
